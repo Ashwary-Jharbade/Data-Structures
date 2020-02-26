@@ -1,0 +1,257 @@
+#include<stdio.h>
+#include<stdlib.h>
+struct node {
+    int data;
+    struct node *left;
+    struct node *right;
+};
+struct node *root=NULL;
+struct node *sroot=NULL;
+int count=1;
+struct node * createnode(int data)
+{
+    struct node * temp=(struct node *)malloc(sizeof(struct node));
+    temp->data=data;
+    temp->right=NULL;
+    temp->left=NULL;
+    return temp;
+}
+
+void createtree(int data)
+{
+    if(root==NULL)
+    {
+        root=createnode(data);
+    }
+}
+
+void inorder(struct node * root)
+{
+    if(root==NULL)
+    {
+        return;
+    }
+    else
+    {
+        inorder(root->left);
+        printf("%d ",root->data);
+        inorder(root->right);
+    }
+}
+
+void createspamtree()
+{
+    struct node * a=createnode(11);
+    struct node * b=createnode(9);
+    struct node * d=createnode(5);
+    struct node * e=createnode(10);
+    struct node * f=createnode(15);
+    struct node * g=createnode(12);
+    struct node * h=createnode(16);
+
+    a->left=b;
+    a->right=f;
+
+    b->left=d;
+    b->right=e;
+
+    f->right=h;
+    f->left=g;
+
+    sroot=a;
+}
+
+void preorder(struct node * p)
+{
+    if(p==NULL)
+        return;
+    printf("%d ",p->data);
+    preorder(p->left);
+    preorder(p->right);
+}
+void postorder(struct node * p)
+{
+    if(p==NULL)
+        return;
+    postorder(p->left);
+    postorder(p->right);
+    printf("%d ",p->data);
+}
+struct node * insert(struct node * rot,int data)
+{
+    if(rot==NULL)
+    {
+        rot=createnode(data);
+        count++;
+        return rot;
+    }
+    if(data<rot->data)
+    {
+        rot->left=insert(rot->left,data);
+    }
+    else{
+        rot->right=insert(rot->right,data);
+    }
+}
+
+int height(struct node * p)
+{
+    if(p==NULL)
+        return 0;
+    int a=height(p->left);
+    int b=height(p->right);
+    return 1+a*(a>b)+b*(b>a)+a*(a==b);
+}
+
+struct node * search(struct node * p,int data)
+{
+    if(p==NULL)
+        return NULL;
+
+    if(p->data==data)
+        return p;
+    else if(data<p->data)
+        search(p->left,data);
+    else{
+        search(p->right,data);
+    }
+}
+
+struct node * parent(struct node *p,int data)
+{
+    if(p==NULL)
+        return NULL;
+    if(data==root->data)
+        printf("Root has no parent\n");
+    else if((p->left!=NULL && p->left->data==data) ||(p->right!=NULL && p->right->data==data))
+    {
+        return p;
+    }
+    else if(data<p->data)
+        parent(p->left,data);
+    else{
+        parent(p->right,data);
+    }
+}
+
+int delnode(struct node * p,int data)
+{
+    count--;
+    int val;
+    struct node *d=search(p,data);
+    val=d->data;
+//    printf("\n%d\n",d->data);
+    if(d->left==NULL && d->right==NULL)
+    {
+        struct node *x=parent(p,data);
+ //       printf("\n%d\n",x->data);
+        if(x->data>d->data)
+        {
+            x->left=NULL;
+        }
+        else{
+            x->right=NULL;
+        }
+        free(d);
+    }
+    else if(d->left!=NULL)
+    {
+        struct node * pr=d->left;
+        while(pr->right)
+        {
+            pr=pr->right;
+        }
+        if(pr->left==NULL)
+        {
+            struct node *x=parent(d,pr->data);
+ //           printf("\n%d\n",x->data);
+            d->data=pr->data;
+            if(x->data<=pr->data)
+                x->right=NULL;
+            else
+                x->left=NULL;
+            free(pr);
+        }
+        else{
+            d->data=pr->data;
+            pr->data=-9999;
+            struct node *x=parent(d,-9999);
+            x->right=pr->left;
+            pr->left=NULL;
+            free(pr);
+        }
+    }
+    else{
+        struct node * pr=d->right;
+        while(pr->left)
+        {
+            pr=pr->left;
+        }
+        if(pr->right==NULL)
+        {
+            struct node *x=parent(d,pr->data);
+            d->data=pr->data;
+            x->right=NULL;
+            free(pr);
+        }
+        else{
+            d->data=pr->data;
+            pr->data=-9999;
+            struct node *x=parent(d,-9999);
+            x->left=pr->right;
+            pr->right=NULL;
+            free(pr);
+        }
+    }
+    return val;
+}
+struct node * mirror(struct node * p)
+{
+    if(p==NULL)
+    {
+        return p;
+    }
+    else{
+        struct node * ptr=NULL;
+        p->left=mirror(p->left);
+        p->right=mirror(p->right);
+        ptr=p->left;
+        p->left=p->right;
+        p->right=ptr;
+    }
+}
+
+int main()
+{
+    createtree(10);
+    insert(root,8);
+    insert(root,13);
+    insert(root,1);
+    insert(root,9);
+    insert(root,11);
+    insert(root,14);
+    insert(root,0);
+    insert(root,5);
+    insert(root,4);
+    insert(root,12);
+    inorder(root);
+    printf("\n");
+/*
+    preorder(root);
+    printf("\n");
+    postorder(root);
+    printf("\n%d",height(root));
+    struct node *x=search(root,1);
+    struct node *p=parent(root,1);
+    if(x)
+        printf("found\n");
+    else
+        printf("Not found\n");
+    printf("\n%d  %d",p->data,x->data);
+*/
+    delnode(root,11);
+    inorder(root);
+    printf("\n%d\n",count);
+    mirror(root);
+    inorder(root);
+}
