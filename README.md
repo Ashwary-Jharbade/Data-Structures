@@ -4,4 +4,5 @@ Building Blocks
 Singly Linked List,
 Queue,
 Stack,
+binarySearchTree,
  
