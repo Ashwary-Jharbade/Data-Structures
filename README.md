@@ -1,7 +1,7 @@
 # Data-Structures
 Building Blocks 
 
-Singly Linked List
-Queue
-Stack
+Singly Linked List,
+Queue,
+Stack,
  
